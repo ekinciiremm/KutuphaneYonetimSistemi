@@ -11,3 +11,9 @@ Bu proje, C# dilinde Nesne Yönelimli Programlama (OOP) prensiplerinden **Kapsü
 ## Kullanılan Teknolojiler
 - C# 
 - .NET
+
+ ##10 Mart 2026 Güncellemesi:
+
+Kitaplar sınıfına Constructor (Yapıcı Metot) yapısı eklendi.
+
+Nesne oluşturma süreci parametreli hale getirilerek kod daha modüler bir yapıya kavuşturuldu.
