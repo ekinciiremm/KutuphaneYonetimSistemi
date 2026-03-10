@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace kutuphaneYonetimi
 {
     public class Kitaplar
@@ -8,12 +8,16 @@ namespace kutuphaneYonetimi
         private int _StokAdedi;
 
 
+        public Kitaplar(string kitapAdi, int stokAdedi)
+        {
+            KitapAdi = kitapAdi;
+            StokAdedi = stokAdedi;
+        }
         public string KitapAdi
         {
             get { return _kitapAdi; }
             set { _kitapAdi = value; }
         }
-
         public int StokAdedi
         {
             get { return _StokAdedi; }
@@ -36,17 +40,16 @@ namespace kutuphaneYonetimi
         }
     }
 
-
     class Program
     {
         static void Main(string[] args)
         {
-            Kitaplar k1 = new Kitaplar();
-            k1.KitapAdi = "Mai ve Siyah";
-            k1.StokAdedi = 34;
+            Kitaplar k1 = new Kitaplar("Mai ve Siyah", 34);
             k1.Yazdir();
 
-            Console.ReadLine();
+            Kitaplar k2 = new Kitaplar("Aşk-ı Memnu", 12);
+            k2.Yazdir();
+
         }
     }
 }
