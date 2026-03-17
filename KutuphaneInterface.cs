@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,9 @@ namespace OOPDeneme.DbManager
 
         string KitapBul(string kitap_adi);
 
+        void KitapSil(string kitap_adi);
+
+        void KitapStokGuncelle(string kitap_adi, int yeniStok);
        
     }
 }
