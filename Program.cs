@@ -10,33 +10,69 @@ namespace OOPDeneme
         {
             KutuphaneInterface servis = new DbManager.DbManager();
 
-            try
-            {
-               
-                Console.WriteLine("Kütüphane Veritabanı Kayıtları");
-                var kitaplar = servis.TumKitaplariGetir();
+            bool secimYap = true;
 
-                foreach (var kitap in kitaplar)
+            Console.WriteLine("Kütüphane Yönetimine Hoşgeldiniz.");
+
+            while (secimYap)
+            {
+                Console.WriteLine("\nLütfen seçim yapınız:");
+                Console.WriteLine("1- Tüm kitapları listele.");
+                Console.WriteLine("2- Kitap ara.");
+                Console.WriteLine("3- Kitap ekle.");
+                Console.WriteLine("4- Kitap sil.");
+                Console.WriteLine("5-Kitap stok adedi güncelle.");
+                Console.WriteLine("0- Çıkış");
+
+                string secim =Console.ReadLine();
+
+                switch (secim)
                 {
-                    Console.WriteLine("- " + kitap);
+                    case "1": var kitaplar = servis.TumKitaplariGetir();
+                        Console.WriteLine("\n- Kitap Listesi -");
+                        foreach (var k in kitaplar) Console.WriteLine("- " + k);
+                        break;
+
+                    case "2":
+                        Console.Write("Aranacak kitap adı: ");
+                        string aranan = Console.ReadLine();
+                        Console.WriteLine(servis.KitapBul(aranan));
+                        break;
+
+                    case "3":
+                        Console.Write("Kitap Adı: "); 
+                        string ad = Console.ReadLine();
+                        Console.Write("ISBN: "); 
+                        string isbn = Console.ReadLine();
+                        Console.Write("Stok: "); 
+                        int stok = int.Parse(Console.ReadLine());
+                        servis.KitapEkle(ad, isbn, stok);
+                        break;
+
+                    case "4": Console.Write("Silinecek kitap adı:"); 
+                        string silinecek= Console.ReadLine();
+                        servis.KitapSil(silinecek);
+                        break;
+
+                    case "5": 
+                        Console.Write("Stoğu güncellenecek kitap adı: "); 
+                        string guncellencekAdi= Console.ReadLine();
+                        Console.Write("Yeni stok sayısı: "); 
+                        int yeniStok= int.Parse(Console.ReadLine());
+                        servis.KitapStokGuncelle(guncellencekAdi,yeniStok);
+                        break;
+
+                    case "0":
+                        secimYap = false;
+                        Console.WriteLine("Uygulamadan çıkış yapılmıştır.");
+                        break;
+
+                    default: 
+                        Console.WriteLine("Geçersiz işlem tekrar deneyin");
+                        break;
                 }
-
-                Console.WriteLine("Aranan Kitap Bulundu");
-                string sonuc = servis.KitapBul("Aşk-ı Memnu");
-                Console.WriteLine(sonuc);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Bir hata oluştu: " + ex.Message);
-            }
-
-            Console.WriteLine("\nÇıkmak için bir tuşa basın...");
-            Console.ReadLine();
-
-           
         }
-
-        
     }
 }
 
