@@ -22,6 +22,8 @@ namespace OOPDeneme
                 Console.WriteLine("3- Kitap ekle.");
                 Console.WriteLine("4- Kitap sil.");
                 Console.WriteLine("5-Kitap stok adedi güncelle.");
+                Console.WriteLine("6- Kitap iade et.");
+                Console.WriteLine("7- Kitap ödünç ver.");
                 Console.WriteLine("0- Çıkış");
 
                 string secim =Console.ReadLine();
@@ -60,6 +62,22 @@ namespace OOPDeneme
                         Console.Write("Yeni stok sayısı: "); 
                         int yeniStok= int.Parse(Console.ReadLine());
                         servis.KitapStokGuncelle(guncellencekAdi,yeniStok);
+                        break;
+
+                    case "6":
+                        Console.Write("İade işlemi ID'si:");
+                        int islemId=int.Parse(Console.ReadLine());
+                        Console.Write("İade edilecek kitap ID'si:");
+                        int kitapId = int.Parse(Console.ReadLine());
+                        servis.KitapIadeAl(islemId, kitapId);
+                        break;
+
+                    case "7": 
+                        Console.Write("Ödünç verilecek Kitap ID: ");
+                        int kId = int.Parse(Console.ReadLine());
+                        Console.Write("Alacak Üye ID: ");
+                        int uId = int.Parse(Console.ReadLine());
+                        servis.KitapOduncVer(kId, uId);
                         break;
 
                     case "0":
