@@ -16,6 +16,9 @@ namespace OOPDeneme.DbManager
         void KitapSil(string kitap_adi);
 
         void KitapStokGuncelle(string kitap_adi, int yeniStok);
-       
+
+        void KitapOduncVer(int Kitap_id, int Uye_id);
+
+        void KitapIadeAl(int Islem_id, int Kitap_id);
     }
 }
