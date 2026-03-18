@@ -15,13 +15,13 @@ namespace OOPDeneme.DbManager
             {
                 baglanti.Open();
 
-                string sorgu = "insert into Kitaplar (kitap_adi, ISBN, Stok_adedi) values (@p1,@p2,@p3)";
+                string sorgu = "insert into Kitaplar (kitap_adi, ISBN, Stok_adedi) values (@kAdi,@isbn,@stok)";
 
                 SqlCommand komut = new SqlCommand(sorgu, baglanti);
 
-                komut.Parameters.AddWithValue("@p1", ad);
-                komut.Parameters.AddWithValue("@p2", isbn);
-                komut.Parameters.AddWithValue("@p3", stok);
+                komut.Parameters.AddWithValue("@kAdi", ad);
+                komut.Parameters.AddWithValue("@isbn", isbn);
+                komut.Parameters.AddWithValue("@stok", stok);
 
                 komut.ExecuteNonQuery();
 
@@ -35,9 +35,9 @@ namespace OOPDeneme.DbManager
             using (SqlConnection baglanti = new SqlConnection(baglantiCumlesi))
             {
                 baglanti.Open();
-                string sorgu = "select kitap_adi, Stok_adedi from Kitaplar where kitap_adi like @p1";
+                string sorgu = "select kitap_adi, Stok_adedi from Kitaplar where kitap_adi like @kAdi";
                 SqlCommand komut = new SqlCommand(sorgu, baglanti);
-                komut.Parameters.AddWithValue("@p1", "%" + kitap_adi + "%");
+                komut.Parameters.AddWithValue("@kAdi", "%" + kitap_adi + "%");
 
                 SqlDataReader oku = komut.ExecuteReader();
 
@@ -55,12 +55,12 @@ namespace OOPDeneme.DbManager
             using (SqlConnection baglanti = new SqlConnection(baglantiCumlesi))
             {
                 baglanti.Open();
-                SqlCommand komut = new SqlCommand("select kitap_adi from Kitaplar", baglanti);
+                SqlCommand komut = new SqlCommand("select kitap_adi , Kitap_id from Kitaplar", baglanti);
                 SqlDataReader oku = komut.ExecuteReader();
 
                 while (oku.Read())
                 {
-                    kitaplar.Add(oku["kitap_adi"].ToString());
+                    kitaplar.Add($"ID: {oku["Kitap_id"]} | Ad: {oku["kitap_adi"]}");
                 }
             }
             return kitaplar;
@@ -71,9 +71,9 @@ namespace OOPDeneme.DbManager
             using (SqlConnection baglanti = new SqlConnection(baglantiCumlesi))
             {
                 baglanti.Open();
-                string sorgu = "delete from Kitaplar where kitap_adi=@p1";
+                string sorgu = "delete from Kitaplar where kitap_adi=@kAdi";
                 SqlCommand komut = new SqlCommand(sorgu,baglanti);
-                komut.Parameters.AddWithValue("@p1", kitap_adi);
+                komut.Parameters.AddWithValue("@kAdi", kitap_adi);
 
                 int etkilenenSatir=komut.ExecuteNonQuery();
 
@@ -93,13 +93,64 @@ namespace OOPDeneme.DbManager
             using (SqlConnection baglanti= new SqlConnection(baglantiCumlesi))
             {
                 baglanti.Open();
-                string sorgu = "update Kitaplar set Stok_adedi = @p1 where kitap_adi= @p2";
+                string sorgu = "update Kitaplar set Stok_adedi = @stok where kitap_adi= @kAdi";
                 SqlCommand komut = new SqlCommand(sorgu,baglanti);
-                komut.Parameters.AddWithValue("@p1", yeniStok);
-                komut.Parameters.AddWithValue("@p2", kitap_adi);
+                komut.Parameters.AddWithValue("@stok", yeniStok);
+                komut.Parameters.AddWithValue("@kAdi", kitap_adi);
 
                 komut.ExecuteNonQuery();
                 Console.WriteLine($"{kitap_adi} için yeni stok: {yeniStok} olarak güncellendi.");
+            }
+        }
+
+        public void KitapOduncVer(int Kitap_id, int Uye_id)
+        {
+            using (SqlConnection baglanti = new SqlConnection(baglantiCumlesi))
+            {
+                baglanti.Open();
+                string stokAzaltSorgu = "update Kitaplar set Stok_adedi=Stok_adedi-1 where Kitap_id=@kId and Stok_adedi>0";
+                SqlCommand stokKomut = new SqlCommand(stokAzaltSorgu,baglanti);
+
+                stokKomut.Parameters.AddWithValue("@kId",Kitap_id);
+                int dusenKitap = stokKomut.ExecuteNonQuery();
+
+                if (dusenKitap>0)
+                {
+                    string islemSorgu = "insert into KitapAlmaİslemleri (Kitap_id, Uye_İd, Alis_tarihi, Islem_durumu) " +
+                        "values(@kId, @uId, getdate(), 'Odunc Verildi.')";
+
+                    SqlCommand islemKomut = new SqlCommand(islemSorgu,baglanti);
+                    islemKomut.Parameters.AddWithValue("@kId",Kitap_id);
+                    islemKomut.Parameters.AddWithValue("@uId",Uye_id);
+                    islemKomut.ExecuteNonQuery();
+
+                    Console.WriteLine("Kitap başarıyla verildi. Stok düşürüldü.");
+                }
+                else
+                {
+                    Console.WriteLine("Kitap stokta yok.");
+                }
+            }
+        }
+
+        public void KitapIadeAl(int Islem_id,int Kitap_id)
+        {
+            using (SqlConnection baglanti= new SqlConnection(baglantiCumlesi))
+            {
+                baglanti.Open();
+                string islemGuncelleSorgu = "update KitapAlmaİslemleri set Iade_tarihi=getdate()," +
+                    " Islem_durumu='İade Edildi.' where Islem_id=@islemId";
+                SqlCommand islemKomut = new SqlCommand(islemGuncelleSorgu,baglanti);
+                islemKomut.Parameters.AddWithValue("@islemId",Islem_id);
+                islemKomut.ExecuteNonQuery();
+
+
+                string stokArttirSorgu = "update Kitaplar set Stok_adedi=Stok_adedi+1 where Kitap_id=@kId";
+                SqlCommand stokKomut = new SqlCommand(stokArttirSorgu,baglanti);
+                stokKomut.Parameters.AddWithValue("@kId",Kitap_id);
+                stokKomut.ExecuteNonQuery();
+
+                Console.WriteLine("Kitap iade alındı, stok arttırıldı.");
             }
         }
     }
