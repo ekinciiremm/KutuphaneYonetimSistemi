@@ -1,14 +1,16 @@
 using Microsoft.Data.SqlClient;
-using OOPDeneme.DbManager; 
+using OOPDeneme.DbManager;
+using System.Collections.Generic;
 using System;
 
 namespace OOPDeneme
 {
     class Program
     {
+        static IDbServis servis = new DbManager.DbManager();
         static void Main(string[] args)
         {
-            KutuphaneInterface servis = new DbManager.DbManager();
+            
 
             bool secimYap = true;
 
@@ -16,81 +18,80 @@ namespace OOPDeneme
 
             while (secimYap)
             {
-                Console.WriteLine("\nLütfen seçim yapınız:");
-                Console.WriteLine("1- Tüm kitapları listele.");
-                Console.WriteLine("2- Kitap ara.");
-                Console.WriteLine("3- Kitap ekle.");
-                Console.WriteLine("4- Kitap sil.");
-                Console.WriteLine("5-Kitap stok adedi güncelle.");
-                Console.WriteLine("6- Kitap iade et.");
-                Console.WriteLine("7- Kitap ödünç ver.");
-                Console.WriteLine("0- Çıkış");
+                Console.WriteLine("1- Kitap Ekle");
+                Console.WriteLine("2- Kitap Sil");
+                Console.WriteLine("0-Çıkış");
 
-                string secim =Console.ReadLine();
+                string secim= Console.ReadLine();
 
-                switch (secim)
-                {
-                    case "1": var kitaplar = servis.TumKitaplariGetir();
-                        Console.WriteLine("\n- Kitap Listesi -");
-                        foreach (var k in kitaplar) Console.WriteLine("- " + k);
+                switch (secim) {
+                    case "1":
+                        KitapEkle();
                         break;
-
-                    case "2":
-                        Console.Write("Aranacak kitap adı: ");
-                        string aranan = Console.ReadLine();
-                        Console.WriteLine(servis.KitapBul(aranan));
-                        break;
-
-                    case "3":
-                        Console.Write("Kitap Adı: "); 
-                        string ad = Console.ReadLine();
-                        Console.Write("ISBN: "); 
-                        string isbn = Console.ReadLine();
-                        Console.Write("Stok: "); 
-                        int stok = int.Parse(Console.ReadLine());
-                        servis.KitapEkle(ad, isbn, stok);
-                        break;
-
-                    case "4": Console.Write("Silinecek kitap adı:"); 
-                        string silinecek= Console.ReadLine();
-                        servis.KitapSil(silinecek);
-                        break;
-
-                    case "5": 
-                        Console.Write("Stoğu güncellenecek kitap adı: "); 
-                        string guncellencekAdi= Console.ReadLine();
-                        Console.Write("Yeni stok sayısı: "); 
-                        int yeniStok= int.Parse(Console.ReadLine());
-                        servis.KitapStokGuncelle(guncellencekAdi,yeniStok);
-                        break;
-
-                    case "6":
-                        Console.Write("İade işlemi ID'si:");
-                        int islemId=int.Parse(Console.ReadLine());
-                        Console.Write("İade edilecek kitap ID'si:");
-                        int kitapId = int.Parse(Console.ReadLine());
-                        servis.KitapIadeAl(islemId, kitapId);
-                        break;
-
-                    case "7": 
-                        Console.Write("Ödünç verilecek Kitap ID: ");
-                        int kId = int.Parse(Console.ReadLine());
-                        Console.Write("Alacak Üye ID: ");
-                        int uId = int.Parse(Console.ReadLine());
-                        servis.KitapOduncVer(kId, uId);
+                        
+                    case "2": 
+                        KitapSil();
                         break;
 
                     case "0":
-                        secimYap = false;
-                        Console.WriteLine("Uygulamadan çıkış yapılmıştır.");
+                        secimYap=false;
                         break;
 
-                    default: 
-                        Console.WriteLine("Geçersiz işlem tekrar deneyin");
-                        break;
+                }
+
+            }
+              
+        } 
+
+
+        static void KitapEkle()
+            {
+            try {  Console.WriteLine("Kitap Adı: ");
+                string ad= Console.ReadLine();
+
+                Console.WriteLine("Stok Sayısı");
+                int stok=int.Parse(Console.ReadLine());
+
+                string sorgu = "insert into Kitaplar (Kitap_adi, Stok_adedi)  values (@kAdi,@sAdedi)";
+                var parametre = new List<SqlParameter> {
+                    new SqlParameter ("@kAdi",ad),
+                    new SqlParameter("@sAdedi",stok)
+                };
+
+                servis.ExecuteCommand(sorgu, parametre);
+                Console.WriteLine("Kitap eklendi.");
+            
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Hata: Stok sayısı içi sayı giriniz.");
+            }
+            catch(Exception ex) { Console.WriteLine(ex.Message); }
+            }
+
+        static void KitapSil() {
+
+                try
+                {
+                    Console.WriteLine("Kitap Adı: ");
+                    string ad = Console.ReadLine();
+                    string sorgu = "delete from Kitaplar where Kitap_adi=@kAdi";
+
+                    var parametre = new List<SqlParameter> {
+                new SqlParameter ("@kAdi",ad)
+                };
+
+                    servis.ExecuteCommand(sorgu, parametre);
+                    Console.WriteLine("Kitap silindi.");
+                }
+            catch(SqlException ex)
+            {
+                Console.WriteLine("Veritabanı Hatası: "+ex.Message);
+            }
+                catch (Exception ex) {
+                    Console.WriteLine("Hata: "+ex.Message);              
                 }
             }
-        }
     }
 }
 
