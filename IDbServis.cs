@@ -10,6 +10,6 @@ namespace OOPDeneme.DbManager
     public interface IDbServis
     {
         void ExecuteCommand(string query, List<SqlParameter> parameters);
-        SqlDataReader ExecuteReader(string query);
+        SqlDataReader ExecuteReader(string query, List<SqlParameter> parameters = null);
     }
 }
